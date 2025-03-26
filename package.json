@@ -35,8 +35,8 @@
     "swagger2openapi": "^5.4.0"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV='production' webpack",
-    "serve": "webpack-dev-server --mode=development",
+    "build": "cross-env NODE_ENV='production' NODE_OPTIONS=--openssl-legacy-provider webpack",
+    "serve": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --mode=development",
     "serve-everyone": "webpack-dev-server --mode=development --host 0.0.0.0",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/**/*.js",
     "lint-fix": "./node_modules/eslint/bin/eslint.js --fix ./src/**/*.js"
@@ -64,5 +64,6 @@
     "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
 }

@@ -126,7 +126,13 @@ function getParameterTableDef(parameters, paramType, localize, includeExample = 
       let { type } = param;
       const format = param.format === 'binary' ? '(binary)' : '';
       if (type === 'array') {
-        type = `array of ${param.items.type}`;
+        let arrayType = param.items.type;
+
+        if (param.items.format === 'binary' || param.items.contentMediaType === 'application/octet-stream') {
+          arrayType = 'multipart/file';
+        }
+
+        type = `array of ${arrayType}`;
       }
       tableContent.push([
         { text: paramName, style: ['small', 'mono'] },
