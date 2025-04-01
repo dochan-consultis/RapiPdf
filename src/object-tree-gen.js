@@ -148,7 +148,7 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     obj['::type'] = 'object';
     for (const key in schema.properties) {
       if (schema.required && schema.required.includes(key)) {
-        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
+        obj[`*${key}`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       } else {
         obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       }
@@ -224,8 +224,19 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     }
     const descrStack = generatePropDescription(propDescrArray, localize);
 
+    const required = prevKey.includes('*');
+    const key = required ? prevKey.substring(1) : prevKey;
+
     return [
-      { text: prevKey, style: ['small', 'mono'], margin: 0 },
+      {
+        text: [
+          { text: required ? '*' : '', style: ['b', 'red'] },
+          {
+            text: key,
+          }],
+        style: ['small', 'mono'],
+        margin: 0,
+      },
       { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
       { stack: descrStack, margin: 0 },
     ];

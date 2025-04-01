@@ -107,7 +107,7 @@ export function getSecurityDef(spec, localize) {
 }
 
 // Parameter Table
-function getParameterTableDef(parameters, paramType, localize, includeExample = false) {
+function getParameterTableDef(parameters, paramType, localize, includeExample = false, requiredParameterNames = []) {
   // let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
   if (parameters === undefined || parameters.length === 0) {
     return;
@@ -134,8 +134,17 @@ function getParameterTableDef(parameters, paramType, localize, includeExample = 
 
         type = `array of ${arrayType}`;
       }
+
+      const required = requiredParameterNames.includes(paramName);
+
       tableContent.push([
-        { text: paramName, style: ['small', 'mono'] },
+        {
+          text: [
+            { text: required ? '*' : '', style: ['small', 'b', 'red', 'mono'] },
+            { text: paramName },
+          ],
+          style: ['small', 'mono'],
+        },
         { text: type + format, style: ['small', 'mono'] },
         { text: includeExample ? (param.example ? param.example : (param.examples && param.examples[0] ? param.examples[0] : '')) : '', style: ['small'], margin: [0, 2, 0, 0] },
         { text: param.description, style: ['small'], margin: [0, 2, 0, 0] },
@@ -224,7 +233,7 @@ function getParameterTableDef(parameters, paramType, localize, includeExample = 
       table: {
         headerRows: 1,
         dontBreakRows: true,
-        widths: ['auto', 'auto', includeExample ? 'auto' : 0, '*'],
+        widths: [110, 'auto', includeExample ? 'auto' : 0, '*'],
         body: tableContent,
       },
       layout: rowLinesTableLayout,
@@ -244,9 +253,11 @@ function getExamplesDef(contentTypeObj, localizedExampleLabel) {
   if (contentTypeObj.examples) {
     let iterCount = 0;
     for (const oneExample in contentTypeObj.examples) {
+      const definition = contentTypeObj.examples[oneExample].value;
+
       exampleSectionDef.push([
-        { text: `${localizedExampleLabel} ${++iterCount}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
-        { text: JSON.stringify(oneExample, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
+        { text: `${localizedExampleLabel} ${++iterCount}: ${oneExample}`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
+        { text: JSON.stringify(definition, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
       ]);
     }
   }
@@ -267,7 +278,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = 
     ];
 
     if ((contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema) {
-      formParamDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', localize);
+      formParamDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', localize, false, contentTypeObj.schema.required);
       content.push(formParamDef);
     } else if (contentType.includes('json') || contentType.includes('xml')) {
       let origSchema = requestBody.content[contentType].schema;
